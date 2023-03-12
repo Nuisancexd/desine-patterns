@@ -1,0 +1,109 @@
+#include <iostream>
+
+class Clown
+{
+public:
+
+	virtual ~Clown() { std::cout << "deleted: " << this << std::endl; }
+
+	virtual const char* get_name_clown() = 0;
+	virtual const char* get_color_clown() = 0;
+};
+
+class Happy :public Clown
+{
+public:
+
+	~Happy() { std::cout << "deleted: " << this << std::endl; }
+
+	const char* get_name_clown()
+	{
+		return "Happy";
+	}
+	const char* get_color_clown()
+	{
+		return "Green";
+	}
+};
+
+
+class Angry :public Clown
+{
+public:
+
+	~Angry() { std::cout << "deleted: " << this << std::endl; }
+
+	const char* get_name_clown()
+	{
+		return "Angry";
+	}
+
+	const char* get_color_clown()
+	{
+		return "Red";
+	}
+};
+
+class PartyClown
+{
+public:
+
+	~PartyClown() { std::cout << "deleted: " << this << std::endl; }
+
+	virtual Clown* createHappy() = 0;
+	virtual Clown* createAngry() = 0;
+};
+
+class Invite : public PartyClown 
+{
+public:
+
+	~Invite() { std::cout << "deleted: " << this << std::endl; }
+
+	Clown* createHappy()
+	{
+		return new Happy();
+	}
+
+	Clown* createAngry()
+	{
+		return new Angry();
+	}
+};
+
+int main() 
+{
+	Invite* inv = new Invite();
+
+	Clown* clown1 = inv->createHappy();
+	std::cout << "Clown " << clown1->get_name_clown() << " color: " << clown1->get_color_clown() << std::endl;
+
+	Clown* clown2 = inv->createAngry();
+	std::cout << "Clown " << clown2->get_name_clown() << " color: " << clown2->get_color_clown() << std::endl;
+
+	delete clown2;
+	delete clown1;
+
+	delete inv;
+
+}
+
+
+
+/*
+Абстрактная фабрика
+
+Абстрактная фабрика — это порождающий паттерн проектирования, который решает проблему создания целых семейств 
+связанных продуктов, без указания конкретных классов продуктов.
+
+Шаблон абстрактной фабрики предназначен для создания цели и предоставляет интерфейс для создания семейств связанных 
+или зависимых объектов без указания их конкретных классов. Шаблон применяется к объекту и имеет дело с объектными 
+отношениями, которые являются более динамичными. В отличие от фабричного метода, шаблон абстрактной фабрики создает
+семейство связанных типов, т.е. он имеет более одного метода типов, которые он производит.
+
+Когда использовать
+-система должна быть независимой от того, как ее продукты создаются, составляются и представляются
+-система должна быть настроена с использованием одного из нескольких семейств продуктов
+-семейство связанных продуктовых объектов предназначено для совместного использования
+-вы хотите предоставить библиотеку классов продуктов, и вы хотите показать только их интерфейсы, а не их реализации
+*/
