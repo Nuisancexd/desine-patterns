@@ -1,0 +1,142 @@
+#include <iostream>
+
+
+typedef uint16_t Signal;
+
+// adaptee interface
+class SocketInterfaceDevice1
+{
+public:
+	virtual uint16_t limit_decode_size() = 0;
+
+	virtual Signal signal_true() = 0;
+	virtual Signal signal_false() = 0;
+	virtual Signal signal_garbage() = 0;
+};
+
+// Adaptee
+class Socket :public SocketInterfaceDevice1
+{
+public:
+	uint16_t limit_decode_size()
+	{
+		return 100;
+	}
+
+	Signal signal_true()
+	{
+		return 1;
+	}
+
+	Signal signal_false()
+	{
+		return 0;
+	}
+	Signal signal_garbage()
+	{
+		return true;
+	}
+};
+
+// Target interface
+class SocketInterfaceDevice2
+{
+public:
+	virtual uint16_t limit_decode_size() = 0;
+
+	virtual Signal signal_true() = 0;
+	virtual Signal signal_false() = 0;
+	virtual Signal signal_garbage() = 0;
+};
+
+
+//The Adapter
+class Adapter : public SocketInterfaceDevice2
+{
+private:
+	SocketInterfaceDevice1* socket;
+public:
+	void plugIn(SocketInterfaceDevice1* dev1)
+	{
+		socket = dev1;
+	}
+
+	uint16_t limit_decode_size()
+	{
+		return 80;
+	}
+
+	Signal signal_true()
+	{
+		return socket->signal_true();
+	}
+	Signal signal_false()
+	{
+		return socket->signal_false();
+	}
+	Signal signal_garbage()
+	{
+		return socket->signal_garbage();
+	}
+};
+
+// client
+class DeviceManag
+{
+private:
+	SocketInterfaceDevice2* dc;
+
+public:
+	void plugIn(SocketInterfaceDevice2* dev2)
+	{
+		dc = dev2;
+	}
+
+	void f()
+	{
+		if (dc->limit_decode_size() > 80)
+		{
+			std::cout << "over limit" << std::endl;
+			return;
+		}
+		if (dc->signal_true() == 1)
+		{
+			std::cout << "SIGNAL!" << std::endl;
+		}
+		if (dc->signal_false() == 0)
+		{
+			std::cout << "no signal" << std::endl;
+		}
+		if (dc->signal_garbage())
+		{
+			std::cout << "whats wrong, garbage signal" << std::endl;
+		}
+	}
+};
+
+int main() 
+{
+	Socket* socket = new Socket;
+	Adapter* adapter = new Adapter;
+	DeviceManag* dev_m = new DeviceManag;
+
+	adapter->plugIn(socket);
+	dev_m->plugIn(adapter);
+
+	dev_m->f();
+}
+
+
+/*
+Адаптер
+Преобразоавние интерфейс класса в другой интерфейс, ожидаемый клиентами. Адаптер позволяет классам работать вместе, 
+что иначе было бы невозможно из-за несовместимых интерфейсов, т.е. позволяет использовать клиент с несовместимым
+интерфейсом с помощью адаптера, выполняющего преобразование. Адаптер имеет структурное назначение и может применяться 
+как к классам, так и к объектам. Адаптер класса использует множественное наследование для адаптации одного интерфейса
+к другому, а адаптер объекта использует композицию объектов для объединения классов с разными интерфейсами.
+
+Когда использовать
+-вы хотите использовать существующий класс, а его интерфейс не соответствует тому, который вам нужен
+-вы хотите создать повторно используемый класс, который взаимодействует с классами, которые не обязательно имеют 
+совместимые интерфейсы
+*/
