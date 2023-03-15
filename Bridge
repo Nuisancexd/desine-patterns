@@ -1,0 +1,103 @@
+#include <iostream>
+
+
+class AbstractInterface
+{
+public:
+    virtual void some_func() = 0;
+};
+
+class ImplementationInterface
+{
+public:
+    virtual void another_func() = 0;
+};
+
+class Bridge : public AbstractInterface
+{
+protected:
+    ImplementationInterface* implementation;
+
+public:
+    Bridge(ImplementationInterface* backend)
+    {
+        implementation = backend;
+    }
+};
+
+class UseCase1 : public Bridge
+{
+public:
+    UseCase1(ImplementationInterface* backend) : Bridge(backend) { }
+
+    void some_func()
+    {
+        std::cout << "UseCase1 on: ";
+        implementation->another_func();
+    }
+};
+
+class UseCase2 : public Bridge
+{
+public:
+    UseCase2(ImplementationInterface* backend) : Bridge(backend) { }
+
+    void some_func()
+    {
+        std::cout << "UseCase2 on: ";
+        implementation->another_func();
+    }
+};
+
+class Clown : public ImplementationInterface
+{
+public:
+    void another_func()
+    {
+        std::cout << "Clown" << std::endl;
+    }
+};
+
+class Shapito : public  ImplementationInterface
+{
+public:
+    void another_func()
+    {
+        std::cout << "Shapito" << std::endl;
+    }
+};
+
+
+
+int main()
+{
+    AbstractInterface* useCase = 0;
+    ImplementationInterface* clown = new Clown;
+    ImplementationInterface* shapito = new Shapito;
+
+    useCase = new UseCase1(clown);
+    useCase->some_func();
+
+    useCase = new UseCase1(shapito);
+    useCase->some_func();
+
+
+    useCase = new UseCase2(clown);
+    useCase->some_func();
+
+    useCase = new UseCase2(shapito);
+    useCase->some_func();
+}
+
+
+/*
+Bridge
+Отделение абстракции от ее реализации, чтобы они могли меняться независимо друг от друга.
+Шаблон bridge имеет структурное назначение и применяется к объектам, поэтому он имеет дело с композицией объектов.
+
+Когда использовать
+- избежать постоянной привязки между абстракцией и ее реализацией
+- как абстракции, так и их реализации должны быть расширяемыми путем создания подклассов.
+- изменения в реализации абстракции не должны влиять на клиентов
+- скрыть реализацию абстракции от клиентов
+*/
