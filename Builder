@@ -1,0 +1,129 @@
+#include <iostream>
+
+
+struct Wheel
+{
+	int size;
+};
+
+struct Engine
+{
+	int horse_power;
+	std::string name_engine;
+};
+
+class Car
+{
+public:
+	Wheel* wheels[4];
+	Engine* engine;
+
+	void specifications()
+	{
+		std::cout << "engine horsepower:" << engine->horse_power << std::endl;
+		std::cout << "engine name:" << engine->name_engine << std::endl;
+		std::cout << "tire size:" << wheels[0]->size << std::endl;
+	}
+};
+
+struct Builder
+{
+	virtual ~Builder() { }
+
+	virtual Wheel* getWheel() = 0;
+	virtual Engine* getEngine() = 0;
+};
+
+class Director
+{
+	Builder* builder;
+	
+public:
+	void set_builder(Builder* new_builder)
+	{
+		builder = new_builder;
+	}
+
+	Car* get_car()
+	{
+		Car* car = new Car;
+		car->engine = builder->getEngine();
+		car->wheels[0] = builder->getWheel();
+		car->wheels[1] = builder->getWheel();
+		car->wheels[2] = builder->getWheel();
+		car->wheels[3] = builder->getWheel();
+
+		return car;
+	}
+};
+
+class DriftBuilder : public Builder
+{
+public:
+	Wheel* getWheel()
+	{
+		Wheel* wheel = new Wheel;
+		wheel->size = 20;
+		return wheel;
+	}
+	Engine* getEngine()
+	{
+		Engine* engine = new Engine;
+		engine->horse_power = 600;
+		engine->name_engine = "2JZ";
+		return engine;
+	}
+};
+
+class RallyBuilder : public Builder
+{
+public:
+	Wheel* getWheel()
+	{
+		Wheel* wheel = new Wheel;
+		wheel->size = 15;
+		return wheel;
+	}
+	Engine* getEngine()
+	{
+		Engine* engine = new Engine;
+		engine->horse_power = 300;
+		engine->name_engine = "WRC";
+		return engine;
+	}
+};
+
+int main()
+{
+	Car* car;
+
+	Director director;
+
+	DriftBuilder drift;
+	RallyBuilder rally;
+
+	std::cout << "Drift" << std::endl;
+	director.set_builder(&drift);
+	car = director.get_car();
+	car->specifications();
+
+	std::cout << "Rally" << std::endl;
+	director.set_builder(&rally);
+	car = director.get_car();
+	car->specifications();
+
+}
+
+
+/* 
+Builder
+Шаблон Builder предназначен для создания и отделения построение сложного объекта от его представления,
+так что один и тот же процесс построения может создавать разные представления. 
+Это шаблон объекта, т.е. отношения могут быть изменены во время выполнения и являются более динамичными. 
+Часто используется для создания составных структур, но для создания объектов требуется больше знаний о клиенте,
+чем при использовании Factory.
+
+Когда использовать
+ - алгоритм создания объекта должен быть независим от частей и способа их сборки
+ - процесс построения должен допускать различные представления для создаваемого объекта
+*/
