@@ -1,0 +1,49 @@
+#include <iostream>
+
+class AbstractClass 
+{
+public:
+    virtual ~AbstractClass() { }
+
+    void templateMethod() 
+    {
+        operation1();
+        operation2();
+    }
+
+    virtual void operation1() = 0;
+    virtual void operation2() = 0;
+};
+
+class ConcreteClass : public AbstractClass 
+{
+public:
+    ~ConcreteClass() { }
+
+    void operation1() 
+    {
+        std::cout << "Operation 1" << std::endl;
+    }
+
+    void operation2() 
+    {
+        std::cout << "Operation 2" << std::endl;
+    }
+};
+
+int main() 
+{
+    AbstractClass* templateClass = new ConcreteClass();
+    templateClass->templateMethod();
+}
+
+/*
+Метод шаблона
+Шаблонный метод определяет скелет алгоритма в операции, откладывая некоторые шаги на подклассы.
+Позволяет подклассам переопределять определенные шаги алгоритма без изменения структуры алгоритма. 
+
+Когда использовать
+реализовать неизменяемые части алгоритма один раз и предоставить подклассам реализовать поведение, 
+которое может варьироваться когда общее поведение среди подклассов должно быть учтено и локализовано в общем классе, 
+чтобы избежать дублирования кода для управления расширениями подклассов
+*/
