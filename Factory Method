@@ -1,0 +1,74 @@
+#include <iostream>
+
+class Clown
+{
+public:
+	virtual ~Clown() {}
+
+	virtual std::string get_color(std::string color) = 0;
+};
+
+struct RedClown : public Clown
+{
+	~RedClown() { }
+
+	std::string get_color(std::string color)
+	{
+		return color;
+	}
+};
+
+struct BlueClown : public Clown
+{	
+	~BlueClown() { }
+
+	std::string get_color(std::string color)
+	{
+		return color;
+	}
+};
+
+class Creator
+{
+public:
+	virtual ~Creator() {};
+
+	virtual Clown* create_red() = 0;
+	virtual Clown* create_blue() = 0;
+
+	virtual void delete_Clown(Clown* clown) = 0;
+};
+
+class FactoryCreator : public Creator
+{
+public:
+	~FactoryCreator() { };
+
+	Clown* create_red()
+	{
+		return new RedClown();
+	}
+	Clown* create_blue()
+	{
+		return new BlueClown();
+	}
+	void delete_Clown(Clown* clown)
+	{
+		delete clown;
+	}
+};
+
+int main()
+{
+	Creator* creator = new FactoryCreator();
+
+	Clown* clown1 = creator->create_blue();
+	std::cout << "clown color: " << clown1->get_color("blue") << std::endl;
+	creator->delete_Clown(clown1);
+
+	Clown* clown2 = creator->create_red();
+	std::cout << "clown color: " << clown2->get_color("red") << std::endl;
+	creator->delete_Clown(clown2);
+
+	delete creator;
+}
