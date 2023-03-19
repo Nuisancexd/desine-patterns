@@ -1,0 +1,65 @@
+#include <iostream>
+#include <map>
+
+
+struct FlyWeight
+{
+    virtual ~FlyWeight() {}
+
+    virtual void operation() = 0;
+};
+
+class Smth : public FlyWeight
+{
+private:
+    int state;
+public:
+    Smth(int state) : state(state) { }
+
+    ~Smth() { }
+
+    void operation()
+    {
+        std::cout << "State: " << state << std::endl;
+    }
+};
+
+class FlyWeightFactory
+{
+private:
+    std::map<int, FlyWeight*> map_state;
+public:
+    ~FlyWeightFactory()
+    {
+        for (auto it = map_state.begin(); it != map_state.end(); ++it)
+        {
+            delete it->second;
+        }
+        map_state.clear();
+    }
+
+    FlyWeight* get_flyweight(const int key)
+    {
+        auto it = map_state.find(key);
+        if (it != map_state.end())
+        {
+            return map_state[key];
+        }
+        FlyWeight* fly = new Smth(key);
+        map_state.insert(std::pair<int, FlyWeight*>(key, fly));
+        return fly;
+    }
+};
+
+int main()
+{
+
+    FlyWeightFactory* factory = new FlyWeightFactory();
+    factory->get_flyweight(5)->operation();
+    factory->get_flyweight(5)->operation();
+    
+
+    delete factory;
+
+    return 0;
+}
